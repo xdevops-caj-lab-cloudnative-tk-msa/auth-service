@@ -7,7 +7,7 @@
 
 ## 设置环境变量
 
-认证服务使用以下的环境变量作为client credentials：
+认证服务使用以下的环境变量作为微服务连接认证服务的client credentials：
 - NOTIFICATION_SERVICE_PASSWORD
 - STATISTICS_SERVICE_PASSWORD
 - ACCOUNT_SERVICE_PASSWORD
