@@ -4,6 +4,43 @@
 
 - [auth-service](https://github.com/xdevops-caj-lab-cloudnative-tk/PiggyMetrics/tree/master/auth-service)
 
+
+## 设置环境变量
+
+认证服务使用以下的环境变量作为client credentials：
+- NOTIFICATION_SERVICE_PASSWORD
+- STATISTICS_SERVICE_PASSWORD
+- ACCOUNT_SERVICE_PASSWORD
+
+Set env vars for bash:
+
+```bash
+echo "export NOTIFICATION_SERVICE_PASSWORD=notification" >> $HOME/.bashrc
+echo "export STATISTICS_SERVICE_PASSWORD=statistics" >> $HOME/.bashrc
+echo "export ACCOUNT_SERVICE_PASSWORD=account" >> $HOME/.bashrc
+
+source $HOME/.bashrc
+
+```
+
+Set env vars for zsh
+
+```bash
+echo "export NOTIFICATION_SERVICE_PASSWORD=notification" >> $HOME/.zshrc
+echo "export STATISTICS_SERVICE_PASSWORD=statistics" >> $HOME/.zshrc
+echo "export ACCOUNT_SERVICE_PASSWORD=account" >> $HOME/.zshrc
+
+source $HOME/.zshrc
+
+```
+
+
+Verify
+```bash
+printenv | grep PASSWORD
+```
+
+
 ## 每个微服务有自己的代码仓库
 
 将原来微服务属于一个Maven module改为每个微服务有自己的代码仓库。
@@ -116,61 +153,7 @@ server:
 
 ## 在本地运行MongoDB
 
-在本地以容器方式运行MongoDB:
-
-```bash
-# create mongodb data directory in host machine
-# replace as your path for container volume
-cd /Users/william/work/data
-mkdir -p mongodb-data
-chmod -R 777 mongodb-data
-
-# run bitnami mongodb container
-# replace as your path for container volume
-podman run -d --name mymongodb -p 27017:27017 \
-  -v /Users/william/work/data/mongodb-data:/bitnami/mongodb \
-  -e MONGODB_USERNAME=user \
-  -e MONGODB_PASSWORD=password \
-  -e MONGODB_ROOT_PASSWORD=password123 \
-  -e MONGODB_DATABASE=authdb \
-  bitnami/mongodb:latest
-```
-
-说明：
-- `podman run`命令中的`-v`参数指定了MongoDB数据目录在宿主机的位置，这样可以保证MongoDB容器重启后数据不会丢失。
-- `podman run`命令中的`-e`参数指定了MongoDB的用户名、密码、数据库等信息，这样可以在MongoDB容器启动时自动创建数据库和用户。
-- `podman run`命令中的`bitnami/mongodb:latest`指定了使用bitnami/mongodb镜像，这个镜像是一个MongoDB的官方镜像，但是在官方镜像的基础上做了一些定制化的修改，比如支持自定义用户名、密码、数据库等信息，这样可以在MongoDB容器启动时自动创建数据库和用户。
-
-
-参考文档：
-- https://hub.docker.com/r/bitnami/mongodb
-
-进入MongoDB容器：
-```bash
-podman exec -it mymongodb /bin/bash
-```
-
-在MongoDB容器中验证：
-```bash
-# login by root
-mongosh -u root -p password123
-show dbs
-
-# login by user
-mongosh -u user -p password --authenticationDatabase authdb
-use authdb
-show collections
-```
-
-
-在VSCode中安装插件`MongoDB for VSCode`，可以在VSCode中直接连接到MongoDB。
-
-添加MongoDB连接：
-```bash
-mongodb://user:password@localhost:27017/authdb
-```
-
-验证可以从MongoDB容器外远程连接MongoDB。
+参见[mongodb](https://github.com/xdevops-caj-lab-cloudnative-tk-msa/mongodb) 来创建MongoDB数据库。
 
 ## 配置连接MongoDB数据库
 
@@ -207,6 +190,21 @@ spring:
 再次本地构建运行。
 
 发现程序可以启动成功。
+
+## 本地调试运行
+
+添加一个application-local.yaml文件，用于本地调试。
+
+指定本地调试时的端口：
+```yaml
+server:
+  port: 5000
+```
+
+本地调试运行：
+```bash
+mvn spring-boot:run -Dspring.profiles.active=local
+```
 
 ## 构建容器镜像
 
@@ -250,18 +248,6 @@ TODO 使用Helm部署bitnami/mongodb
 TODO Kubernetes deployment, confimap, secret, service
 
 
-## 小结
-
-本例的微服务容器化改造：
-- 每个微服务有自己的代码仓库
-- 去除从Spring Cloud Config Server拉取配置
-- 将原来在Spring Cloud Config Server中的配置放到每个微服务的application.yaml中
-- 去除注册到Eureka Server
-- 去除Spring Cloud依赖（只保留必须使用的依赖）
-- 使用默认端口（8080）
-- 使用本地容器化的数据库进行调试
-- 构建和管理容器镜像
-- 部署到Kubernetes，需要外部化的配置放到Kubernetes的ConfigMap或Secret中
 
 
 
