@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: auth-service
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://user:password@localhost:27017/authdb}
+
+server:
+  servlet:
+    context-path: /uaa
