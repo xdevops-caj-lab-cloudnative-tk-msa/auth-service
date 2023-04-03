@@ -220,8 +220,12 @@ CMD java -jar /opt/app.jar
 EXPOSE 8080
 ```
 
-构建容器镜像：
+先构建应用：
+```bash
+mvn clean install
+```
 
+构建容器镜像：
 ```bash
 podman build -t auth-service .
 ```
@@ -239,15 +243,11 @@ podman push quay.io/xxx/auth-service:latest
 
 在piggymeticrs-config仓库中集中管理多个微服务的Kubernetes YAML。
 
-### 部署MongoDB
-
-TODO 使用Helm部署bitnami/mongodb
-
-### 部署应用
-
-TODO Kubernetes deployment, confimap, secret, service
-
-
+创建Kubernetes Secret，包括：
+- MONGODB_URI
+- ACCOUNT_SERVICE_PASSWORD
+- STATISTICS_SERVICE_PASSWORD
+- NOTIFICATION_SERVICE_PASSWORD
 
 
 
